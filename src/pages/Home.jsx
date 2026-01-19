@@ -6,7 +6,7 @@ import { Monitor, Cpu, Wrench } from 'lucide-react';
 
 const Home = () => {
     const [shopInfo, setShopInfo] = useState({
-        shop_name: 'Computer Shop',
+        shop_name: 'Vikrant Computers',
         hero_text: 'Your one-stop destination for premium computers and expert repair services.'
     });
     const [loading, setLoading] = useState(true);
