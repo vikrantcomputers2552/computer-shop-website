@@ -49,7 +49,7 @@ const Contact = () => {
         e.preventDefault();
 
         // Use the secure FormSubmit ID instead of exposing the email directly
-        const formId = '52ccf7f21f0cbde2751aed87fe7fd75f';
+        const formId = import.meta.env.VITE_FORM_ID;
 
         setSending(true);
         setSubmitStatus({ type: null, message: '' });
