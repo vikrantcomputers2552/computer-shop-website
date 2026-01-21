@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, Save, LogOut, Upload, X } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Upload, X } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('products'); // 'products', 'settings'
     const [loading, setLoading] = useState(false);
+
+    const modules = {
+        toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['clean']
+        ],
+    };
 
     // Product State
     const [products, setProducts] = useState([]);
@@ -169,9 +179,7 @@ const AdminDashboard = () => {
             const { error } = await supabase.from('products').delete().eq('id', id);
             if (error) throw error;
 
-            // 2. Delete from Storage (Optional optimization, but good practice)
-            // Extract filename from URL... (omitted for simplicity, but cleaner to do)
-
+            // 2. Delete from Storage (Optional optimization)
             fetchProducts();
         } catch (error) {
             console.error('Error deleting product:', error);
@@ -422,7 +430,13 @@ const AdminDashboard = () => {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Specs / Description</label>
-                                        <textarea required rows={3} value={productForm.specs} onChange={(e) => setProductForm({ ...productForm, specs: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={productForm.specs}
+                                            onChange={(content) => setProductForm({ ...productForm, specs: content })}
+                                            modules={modules}
+                                            className="mt-1 bg-white"
+                                        />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
