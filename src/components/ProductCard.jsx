@@ -28,32 +28,32 @@ const ProductCard = ({ product, shopEmail }) => {
             transition={{ duration: 0.3 }}
             className="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 flex flex-col h-full group"
         >
-            <Link to={`/products/${id}`} className="block relative h-48 bg-gray-200 overflow-hidden">
+            <Link to={`/products/${id}`} className="block relative h-[160px] sm:h-[180px] bg-gray-200 overflow-hidden">
                 <img
                     src={image_url}
                     alt={name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                 />
-                <div className={`absolute top-2 right-2 px-2 py-1 text-xs font-bold uppercase tracking-wide text-white rounded-md ${condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
+                <div className={`absolute top-2 right-2 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white rounded-md ${condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
                     {condition}
                 </div>
             </Link>
-            <div className="p-4 flex flex-col flex-grow">
+            <div className="p-3 flex flex-col flex-grow">
                 <Link to={`/products/${id}`} className="block">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">{name}</h3>
+                    <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-primary-600 transition-colors">{name}</h3>
                 </Link>
-                <div className="text-gray-600 text-sm mb-4 flex-grow line-clamp-4" dangerouslySetInnerHTML={{ __html: specs }}></div>
-                <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+                <div className="text-gray-600 text-sm mb-3 flex-grow line-clamp-2" dangerouslySetInnerHTML={{ __html: specs }}></div>
+                <div className="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center">
                     {price !== null && price !== undefined ? (
-                        <span className="text-xl font-bold text-primary-600">
+                        <span className="text-lg font-semibold text-primary-600">
                             ₹{Number(price).toLocaleString()}
                         </span>
                     ) : (
                         shopEmail ? (
                             <a
                                 href={handleCreateMailto()}
-                                className="text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md transition-colors"
+                                className="text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-3 py-1.5 rounded-md transition-colors"
                             >
                                 Contact for Price
                             </a>

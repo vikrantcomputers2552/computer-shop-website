@@ -22,7 +22,7 @@ const ProductDetails = () => {
                 // 1. Fetch Product
                 const { data: productData, error: productError } = await supabase
                     .from('products')
-                    .select('*')
+                    .select('*, categories(name)')
                     .eq('id', productId)
                     .single();
 
@@ -127,10 +127,17 @@ const ProductDetails = () => {
                     className="flex flex-col h-full"
                 >
                     <div className="mb-6">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide text-white mb-4 ${product.condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
-                            {product.condition}
-                        </span>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+                        <div className="flex space-x-2 mb-4">
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide text-white ${product.condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
+                                {product.condition}
+                            </span>
+                            {product.categories && (
+                                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide text-gray-700 bg-gray-200">
+                                    {product.categories.name}
+                                </span>
+                            )}
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
                         <p className="text-2xl font-semibold text-primary-600">
                             {product.price ? `₹${Number(product.price).toLocaleString()}` : "Contact for Price"}
                         </p>

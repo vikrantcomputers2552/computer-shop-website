@@ -10,6 +10,8 @@ import AdminResetPassword from './pages/AdminResetPassword';
 import AdminUpdatePassword from './pages/AdminUpdatePassword';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import Footer from './components/Footer';
+
 function App() {
     return (
         <Router>
@@ -36,6 +38,7 @@ function App() {
                         />
                     </Routes>
                 </main>
+                <Footer />
             </div>
         </Router>
     );

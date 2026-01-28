@@ -7,12 +7,15 @@ A professional, production-ready website for a computer repair & sales shop. Fea
 - **Public Website**:
   - **Fast Performance**: Built with Vite + React.
   - **Live Product Catalog**: Real-time fetching from Supabase.
-  - **Smart Filtering**: Filter by "New" or "Refurbished".
+  - **Smart Filtering**: Filter by "New", "Refurbished", or Group by Category.
+  - **Advanced Search**: Fuzzy search logic (finds matches even with typos).
   - **Contact Integration**: "Contact for Price" button auto-generates emails with product details.
-  - **Mobile-First**: Fully responsive design with Framer Motion animations.
 - **Admin Panel**:
-  - **Secure Access**: Email/Password login (No public signup).
-  - **Dashboard**: Full CRUD for products and Shop Settings.
+  - **Bulk Import**: Import hundreds of products from **Excel, CSV, or JSON**.
+    - **Smart Categories**: Automatically creates new categories if they don't exist.
+    - **Validation**: Auto-maps names, specs, and prices.
+  - **Product Visibility**: Products without images are **automatically hidden** from the public site until an image is validated/uploaded.
+  - **Rich Text Editor**: Format product descriptions with Bold, Lists, etc. (Quill.js).
   - **Image Handling**: Client-side compression (max 0.5MB) + automatic WebP conversion.
   - **Settings Management**: Update phone, email, hero text, etc. instantly.
 
@@ -20,8 +23,12 @@ A professional, production-ready website for a computer repair & sales shop. Fea
 
 - **Frontend**: React, Vite, Tailwind CSS, Framer Motion
 - **Backend**: Supabase (Postgres Database, Auth, Storage)
+- **Utilities**: 
+  - `papaparse` & `xlsx` (Bulk Import)
+  - `fuse.js` (Fuzzy Search)
+  - `react-quill` (Rich Text)
+  - `browser-image-compression` (Optimization)
 - **Security**: Row Level Security (RLS) policies
-- **Icons**: Lucide React
 
 ## Setup Instructions
 
@@ -35,7 +42,7 @@ A professional, production-ready website for a computer repair & sales shop. Fea
 2.  **Database & Storage**:
     - Go to the **SQL Editor** in your dashboard.
     - Copy the contents of `supabase_schema.sql` (root of this repo).
-    - Run the script. This creates tables (`products`, `shop_settings`), storage buckets, and applies secure RLS policies.
+    - Run the script. This creates tables (`products`, `categories`, `shop_settings`), storage buckets, and applies secure RLS policies.
     - *Note: The script is safe to run multiple times.*
 3.  **Create Admin User**:
     - Go to **Authentication** -> **Users**.
@@ -83,6 +90,6 @@ Deploy the `dist` folder to Vercel, Netlify, or similar.
 
 - **Git Hygiene**: `.env` and `.sql` files are ignored to prevent credential leaks.
 - **RLS Enforced**:
-  - Public: Read-only access to products/settings.
+  - Public: Read-only access to available products.
   - Admin: Full Write access (Insert/Update/Delete).
   - Enforced by Postgres engine, not just frontend logic.
