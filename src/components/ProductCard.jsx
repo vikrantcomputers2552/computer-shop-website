@@ -32,7 +32,7 @@ const ProductCard = ({ product, shopEmail }) => {
                 <img
                     src={image_url}
                     alt={name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                 />
                 <div className={`absolute top-2 right-2 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white rounded-md ${condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>

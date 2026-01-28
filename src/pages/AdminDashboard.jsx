@@ -266,7 +266,13 @@ const AdminDashboard = () => {
         const file = e.target.files[0];
         if (!file) return;
         try {
-            const compressedFile = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1024, useWebWorker: true, fileType: 'image/webp' });
+            const compressedFile = await imageCompression(file, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1200,
+                useWebWorker: true,
+                fileType: 'image/webp',
+                initialQuality: 0.75
+            });
             setProductForm({ ...productForm, image: compressedFile });
             setImagePreview(URL.createObjectURL(compressedFile));
         } catch (error) {
@@ -433,7 +439,7 @@ const AdminDashboard = () => {
                                 {filteredProducts.map((product) => (
                                     <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 flex flex-col group">
                                         <div className="relative h-40 bg-gray-100 overflow-hidden">
-                                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                            <img src={product.image_url} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                                             <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
                                                 <div className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white rounded-md ${product.condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
                                                     {product.condition}
