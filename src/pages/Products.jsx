@@ -153,7 +153,6 @@ const Products = () => {
                         <div key={category}>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-2xl font-bold text-gray-900">{category}</h2>
-                                <span className="text-sm text-gray-500">{items.length} items</span>
                             </div>
                             <div className="flex overflow-x-auto pb-6 -mx-4 px-4 gap-6 snap-x snap-mandatory hide-scrollbar">
                                 {items.map((product) => (

@@ -28,6 +28,7 @@ const AdminDashboard = () => {
     // Product State
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]); // New Categories State
+    const [selectedCategory, setSelectedCategory] = useState('all'); // Category Filter State
     const [searchTerm, setSearchTerm] = useState('');
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
@@ -79,21 +80,27 @@ const AdminDashboard = () => {
 
     // Filter Products with Fuse.js
     const filteredProducts = React.useMemo(() => {
-        if (!searchTerm) return products;
+        let result = products;
+
+        if (selectedCategory !== 'all') {
+            result = result.filter(p => p.category_id === selectedCategory);
+        }
+
+        if (!searchTerm) return result;
 
         const fuseOptions = {
             keys: ['name', 'plainSpecs', 'categories.name'], // Added category to search
             threshold: 0.4,
         };
 
-        const searchableProducts = products.map(p => ({
+        const searchableProducts = result.map(p => ({
             ...p,
             plainSpecs: stripHtml(p.specs)
         }));
 
         const fuse = new Fuse(searchableProducts, fuseOptions);
         return fuse.search(searchTerm).map(result => result.item);
-    }, [products, searchTerm]);
+    }, [products, searchTerm, selectedCategory]);
 
     // --- Category Handlers ---
     const handleAddCategory = async (e) => {
@@ -341,6 +348,7 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-gray-900">
             {/* Navbar */}
+            {/* Navbar */}
             <nav className="bg-white shadow-sm sticky top-0 z-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
@@ -349,6 +357,33 @@ const AdminDashboard = () => {
                                 Dashboard
                             </h1>
                         </div>
+
+                        {/* Desktop Tab Nav - Centered */}
+                        <div className="hidden md:flex items-center space-x-1 bg-gray-50 p-1 rounded-xl">
+                            {['products', 'categories', 'settings'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`
+                                        relative flex items-center px-4 py-1.5 text-sm font-medium rounded-lg transition-all duration-200
+                                        ${activeTab === tab ? 'text-primary-700' : 'text-gray-500 hover:text-gray-900'}
+                                    `}
+                                >
+                                    {activeTab === tab && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10 flex items-center capitalize">
+                                        {tab === 'products' ? <Package className="w-4 h-4 mr-2" /> : tab === 'categories' ? <Package className="w-4 h-4 mr-2" /> : <Settings className="w-4 h-4 mr-2" />}
+                                        {tab}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="flex items-center space-x-4">
                             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-gray-500">
                                 <Menu />
@@ -365,37 +400,23 @@ const AdminDashboard = () => {
                 {/* Mobile Tab Nav */}
                 {mobileMenuOpen && (
                     <div className="md:hidden px-4 pb-4 space-y-2 bg-white border-t">
-                        <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-red-600 font-medium">Logout</button>
+                        <div className="pt-2 pb-2 space-y-1">
+                            {['products', 'categories', 'settings'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => { setActiveTab(tab); setMobileMenuOpen(false); }}
+                                    className={`w-full text-left px-4 py-2 rounded-md font-medium capitalize ${activeTab === tab ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-red-600 font-medium border-t border-gray-100">Logout</button>
                     </div>
                 )}
             </nav>
 
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {/* Tab Switcher */}
-                <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm mb-6 w-fit mx-auto">
-                    {['products', 'categories', 'settings'].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`
-                                relative flex items-center px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
-                                ${activeTab === tab ? 'text-primary-700' : 'text-gray-500 hover:text-gray-900'}
-                            `}
-                        >
-                            {activeTab === tab && (
-                                <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute inset-0 bg-primary-50 rounded-lg"
-                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                            <span className="relative z-10 flex items-center capitalize">
-                                {tab === 'products' ? <Package className="w-4 h-4 mr-2" /> : tab === 'categories' ? <Package className="w-4 h-4 mr-2" /> : <Settings className="w-4 h-4 mr-2" />}
-                                {tab}
-                            </span>
-                        </button>
-                    ))}
-                </div>
 
                 <AnimatePresence mode="wait">
                     {activeTab === 'products' ? (
@@ -408,55 +429,80 @@ const AdminDashboard = () => {
                         >
                             {/* Actions Bar */}
                             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                                <div className="relative w-full sm:w-96">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Search className="h-5 w-5 text-gray-400" />
+                                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-grow">
+                                    {/* Category Filter */}
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="rounded-lg border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 py-2.5 sm:w-48"
+                                    >
+                                        <option value="all">All Categories</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                    </select>
+
+                                    {/* Search */}
+                                    <div className="relative flex-grow">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Search className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder={`Search ${filteredProducts.length} products...`}
+                                            className="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 py-2.5"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
                                     </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Search products..."
-                                        className="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 py-2.5"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
                                 </div>
-                                <button
-                                    onClick={() => openProductModal()}
-                                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors"
-                                >
-                                    <Plus className="h-5 w-5 mr-2" /> Add Product
-                                </button>
-                                <button
-                                    onClick={() => setIsImportModalOpen(true)}
-                                    className="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                >
-                                    <FileUp className="h-5 w-5 mr-2" /> Import
-                                </button>
+
+                                <div className="flex w-full sm:w-auto gap-2">
+                                    <button
+                                        onClick={() => openProductModal()}
+                                        className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+                                    >
+                                        <Plus className="h-5 w-5 mr-2" /> <span className="hidden sm:inline">Add Product</span><span className="sm:hidden">Add</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setIsImportModalOpen(true)}
+                                        className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                                    >
+                                        <FileUp className="h-5 w-5 mr-2" /> Import
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Product Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {filteredProducts.map((product) => (
-                                    <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 flex flex-col group">
-                                        <div className="relative h-40 bg-gray-100 overflow-hidden">
+                                    <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 flex flex-row sm:flex-col h-28 sm:h-auto group">
+                                        {/* Image Section */}
+                                        <div className="relative w-28 sm:w-full h-full sm:h-40 bg-gray-100 flex-shrink-0">
                                             <img src={product.image_url} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                                            <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                                                <div className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white rounded-md ${product.condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
+                                            {/* Badges - Hidden on mobile small view to save space, or moved if critical */}
+                                            <div className="absolute top-1 right-1 sm:top-2 sm:right-2 flex flex-col gap-1 items-end">
+                                                <div className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-[8px] sm:text-[10px] font-bold uppercase tracking-wide text-white rounded bg-opacity-90 ${product.condition === 'new' ? 'bg-green-500' : 'bg-amber-500'}`}>
                                                     {product.condition}
                                                 </div>
-                                                {product.categories && (
-                                                    <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-700 bg-white/90 backdrop-blur-sm rounded-md shadow-sm">
-                                                        {product.categories.name}
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
-                                        <div className="p-4 flex flex-col flex-grow">
-                                            <h3 className="text-base font-bold text-gray-900 mb-1 truncate">{product.name}</h3>
-                                            <p className="text-primary-600 font-semibold mb-3 text-sm">
-                                                {product.price ? `₹${Number(product.price).toLocaleString()}` : "Contact for Price"}
-                                            </p>
-                                            <div className="mt-auto flex justify-end space-x-2 pt-3 border-t border-gray-50">
+
+                                        {/* Content Section */}
+                                        <div className="p-3 flex flex-col flex-grow justify-between sm:justify-start overflow-hidden">
+                                            <div>
+                                                <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">{product.name}</h3>
+                                                <p className="text-primary-600 font-semibold mb-1 text-xs sm:text-sm">
+                                                    {product.price ? `₹${Number(product.price).toLocaleString()}` : "Contact"}
+                                                </p>
+                                                {product.categories && (
+                                                    <span className="inline-block px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
+                                                        {product.categories.name}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex justify-end space-x-2 mt-auto sm:pt-3 sm:border-t border-gray-50">
                                                 <button onClick={() => openProductModal(product)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                                                     <Edit className="h-4 w-4" />
                                                 </button>
